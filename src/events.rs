@@ -197,4 +197,25 @@ mod tests {
         assert!(parse_timestamp("2026-05-15T10:15:00+00:00").is_err());
         assert!(parse_timestamp("2026-05-15T10:15:00Z").is_ok());
     }
+
+    #[test]
+    fn fractional_seconds_are_accepted_but_preserved_verbatim() {
+        // Documented behaviour: we accept fractional-second suffixes only
+        // when the input still ends with `Z`. The canonical record stores
+        // the operator's original timestamp string byte-for-byte, so
+        // "10:15:00Z" and "10:15:00.000Z" are NOT semantically merged —
+        // they produce different canonical bytes and different hashes.
+        // This is intentional: we do not normalize operator input.
+        assert!(parse_timestamp("2026-05-15T10:15:00.123Z").is_ok());
+        assert!(parse_timestamp("2026-05-15T10:15:00.000Z").is_ok());
+        assert!(parse_timestamp("2026-05-15T10:15:00Z").is_ok());
+    }
+
+    #[test]
+    fn reject_obvious_garbage_timestamps() {
+        assert!(parse_timestamp("").is_err());
+        assert!(parse_timestamp("yesterday").is_err());
+        assert!(parse_timestamp("2026-05-15").is_err());
+        assert!(parse_timestamp("2026-13-15T10:15:00Z").is_err()); // invalid month
+    }
 }

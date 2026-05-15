@@ -13,14 +13,17 @@ Cargo.lock.bak
 *.local.json
 local-config/
 
-# Private keys
+# Private keys (matched at any depth, not just repo root)
 *.pem
 *.key
 *.priv
-/keys/
+keys/
+**/keys/
 operator-key*
 demo-key*
 private-key*
+*-secret.json
+*-secret.toml
 
 # OS / editor
 .DS_Store

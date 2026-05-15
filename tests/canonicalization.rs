@@ -191,6 +191,22 @@ fn reject_float_in_canonical_payload() {
 }
 
 #[test]
+fn input_key_order_does_not_affect_canonical_bytes() {
+    // With serde_json's preserve_order feature, these two parses produce
+    // Values with different internal key order. The canonical encoder MUST
+    // sort, so both must yield the same canonical bytes.
+    let a: serde_json::Value =
+        serde_json::from_str(r#"{"z":1,"y":2,"x":3,"events":[],"telemetry":{"b":1,"a":2}}"#)
+            .unwrap();
+    let b: serde_json::Value =
+        serde_json::from_str(r#"{"telemetry":{"a":2,"b":1},"events":[],"x":3,"y":2,"z":1}"#)
+            .unwrap();
+    let ca = to_canonical_bytes(&a).unwrap();
+    let cb = to_canonical_bytes(&b).unwrap();
+    assert_eq!(ca, cb);
+}
+
+#[test]
 fn known_canonical_hash_for_minimal_input() {
     // Golden vector: any change to the canonical encoder, scaling rules,
     // or schema field set will break this test.

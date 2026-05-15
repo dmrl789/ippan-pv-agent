@@ -244,6 +244,55 @@ mod tests {
     }
 
     #[test]
+    fn reject_negative_for_required_non_negative_fields() {
+        // GHI, powers, performance ratio, and energy must reject negatives.
+        let mut raw = RawTelemetry {
+            ghi_w_m2: "-1".into(),
+            ambient_temperature_c: "0".into(),
+            dc_power_kw: "0".into(),
+            ac_power_kw: "0".into(),
+            meter_power_kw: "0".into(),
+            performance_ratio: "0".into(),
+            energy_since_start_kwh: "0".into(),
+        };
+        assert!(matches!(
+            raw.to_canonical().unwrap_err(),
+            Error::NegativeValue { .. }
+        ));
+        raw.ghi_w_m2 = "0".into();
+        raw.dc_power_kw = "-1".into();
+        assert!(matches!(
+            raw.to_canonical().unwrap_err(),
+            Error::NegativeValue { .. }
+        ));
+        raw.dc_power_kw = "0".into();
+        raw.performance_ratio = "-0.5".into();
+        assert!(matches!(
+            raw.to_canonical().unwrap_err(),
+            Error::NegativeValue { .. }
+        ));
+        raw.performance_ratio = "0".into();
+        raw.energy_since_start_kwh = "-1".into();
+        assert!(matches!(
+            raw.to_canonical().unwrap_err(),
+            Error::NegativeValue { .. }
+        ));
+
+        // Ambient temperature, on the other hand, MAY be negative.
+        raw.energy_since_start_kwh = "0".into();
+        raw.ambient_temperature_c = "-5.0".into();
+        let c = raw.to_canonical().expect("temperature can be negative");
+        assert_eq!(c.ambient_temperature_milli_c, -5_000);
+    }
+
+    #[test]
+    fn integer_overflow_is_caught_not_silently_wrapped() {
+        // A value too large to fit in i64 after scaling must error, not wrap.
+        assert!(parse_scaled("f", "99999999999999999999", 3).is_err());
+        assert!(parse_scaled("f", "9999999999999.999", 6).is_err());
+    }
+
+    #[test]
     fn palermo_example_converts() {
         let raw = RawTelemetry {
             ghi_w_m2: "554".into(),

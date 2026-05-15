@@ -19,7 +19,7 @@ the source data:
   "timestamp": "2026-05-15T10:15:00Z",
   "interval_minutes": 15,
   "location": { "city": "Palermo", "country": "IT" },
-  "source": { "source_type": "pv_simulator", "source_id": "desiree-palermo-sim-v1" },
+  "source": { "source_type": "pv_simulator", "source_id": "nicola-palermo-sim-v1" },
   "telemetry": {
     "ghi_w_m2": "554",
     "ambient_temperature_c": "20.5",
@@ -84,7 +84,7 @@ Attached events are sorted deterministically by:
   "interval_minutes": 15,
   "source": {
     "source_type": "pv_simulator",
-    "source_id": "desiree-palermo-sim-v1"
+    "source_id": "nicola-palermo-sim-v1"
   },
   "location": { "city": "Palermo", "country": "IT" },
   "telemetry": {

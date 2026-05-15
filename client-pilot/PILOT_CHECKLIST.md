@@ -25,7 +25,7 @@ run later.
 [ ]  3. Verify the generated bundle
         → target/release/pv-agent verify --bundle <bundle-path>
         → Expect: "PV evidence verification: PASS"
-                  "canonical_hash: sha256:c2150ae864...d9171"
+                  "canonical_hash: sha256:ed47bc9df7...6256"
 
 [ ]  4. Inspect the bundle
         → target/release/pv-agent inspect --bundle <bundle-path>

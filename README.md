@@ -115,7 +115,7 @@ Example anchor request body:
   "evidence_bundle_id": "pv-palermo-pv-001-20260515T101500Z",
   "commitment": {
     "algorithm": "sha256",
-    "hash": "c2150ae864a62d1bbdc284b81a55494656fff3b218838bab8fc848efa94d9171"
+    "hash": "ed47bc9df77ad56dc0b11f05d365b1a79adaec1f20563bcfa5b37496ca236256"
   }
 }
 ```
@@ -219,7 +219,7 @@ bytes. You can re-verify it with any SHA-256 tool:
 
 ```bash
 sha256sum data/pv-agent/palermo-pv-001/records/2026/05/15/pv-palermo-pv-001-20260515T101500Z/canonical-record.json
-# → c2150ae864a62d1bbdc284b81a55494656fff3b218838bab8fc848efa94d9171
+# → ed47bc9df77ad56dc0b11f05d365b1a79adaec1f20563bcfa5b37496ca236256
 ```
 
 ## 9. Verifying an evidence bundle
@@ -369,7 +369,7 @@ this is deliberate, to avoid binary-float ambiguity):
   },
   "source": {
     "source_type": "pv_simulator",
-    "source_id": "desiree-palermo-sim-v1"
+    "source_id": "nicola-palermo-sim-v1"
   },
   "telemetry": {
     "ghi_w_m2": "554",
@@ -617,7 +617,7 @@ And in-depth reference material lives under
 
 1. **Run the Palermo 1MW demo locally** to confirm the binary
    produces the expected canonical hash:
-   `sha256:c2150ae864a62d1bbdc284b81a55494656fff3b218838bab8fc848efa94d9171`.
+   `sha256:ed47bc9df77ad56dc0b11f05d365b1a79adaec1f20563bcfa5b37496ca236256`.
 2. **Produce one real 15-minute record** from your own simulator
    output via `pv-agent run-once`. Verify it locally.
 3. **Walk the pilot checklist** in

@@ -15,7 +15,7 @@ pub fn palermo_raw_input() -> RawInput {
         },
         source: Source {
             source_type: "pv_simulator".into(),
-            source_id: "desiree-palermo-sim-v1".into(),
+            source_id: "nicola-palermo-sim-v1".into(),
         },
         telemetry: RawTelemetry {
             ghi_w_m2: "554".into(),

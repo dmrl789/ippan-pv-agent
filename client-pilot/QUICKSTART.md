@@ -72,7 +72,7 @@ You should see:
 PV evidence verification: PASS
 record_id: pv-palermo-pv-001-20260515T101500Z
 plant_id: palermo-pv-001
-canonical_hash: sha256:c2150ae864a62d1bbdc284b81a55494656fff3b218838bab8fc848efa94d9171
+canonical_hash: sha256:ed47bc9df77ad56dc0b11f05d365b1a79adaec1f20563bcfa5b37496ca236256
 checks:
   canonical_reproducible:           true
   canonical_hash_matches_manifest:  true
@@ -132,7 +132,7 @@ SHA-256 tool:
 
 ```bash
 sha256sum data/pv-agent/palermo-pv-001/records/2026/05/15/pv-palermo-pv-001-20260515T101500Z/canonical-record.json
-# → c2150ae864a62d1bbdc284b81a55494656fff3b218838bab8fc848efa94d9171
+# → ed47bc9df77ad56dc0b11f05d365b1a79adaec1f20563bcfa5b37496ca236256
 ```
 
 That number is the heart of the system. As long as nothing changes the

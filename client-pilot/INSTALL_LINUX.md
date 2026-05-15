@@ -97,14 +97,14 @@ PV evidence verification: PASS
 Expected canonical hash (must match exactly for the bundled demo):
 
 ```
-sha256:c2150ae864a62d1bbdc284b81a55494656fff3b218838bab8fc848efa94d9171
+sha256:ed47bc9df77ad56dc0b11f05d365b1a79adaec1f20563bcfa5b37496ca236256
 ```
 
 You can re-check the hash with the standard tool:
 
 ```bash
 sha256sum data/pv-agent/palermo-pv-001/records/2026/05/15/pv-palermo-pv-001-20260515T101500Z/canonical-record.json
-# → c2150ae864a62d1bbdc284b81a55494656fff3b218838bab8fc848efa94d9171
+# → ed47bc9df77ad56dc0b11f05d365b1a79adaec1f20563bcfa5b37496ca236256
 ```
 
 ## 6. Where files are stored

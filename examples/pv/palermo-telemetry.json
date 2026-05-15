@@ -8,7 +8,7 @@
   },
   "source": {
     "source_type": "pv_simulator",
-    "source_id": "desiree-palermo-sim-v1"
+    "source_id": "nicola-palermo-sim-v1"
   },
   "telemetry": {
     "ghi_w_m2": "554",

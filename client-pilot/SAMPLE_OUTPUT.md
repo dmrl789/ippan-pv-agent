@@ -39,7 +39,7 @@ data/pv-agent/palermo-pv-001/records/2026/05/15/pv-palermo-pv-001-20260515T10150
 PV evidence verification: PASS
 record_id: pv-palermo-pv-001-20260515T101500Z
 plant_id: palermo-pv-001
-canonical_hash: sha256:c2150ae864a62d1bbdc284b81a55494656fff3b218838bab8fc848efa94d9171
+canonical_hash: sha256:ed47bc9df77ad56dc0b11f05d365b1a79adaec1f20563bcfa5b37496ca236256
 checks:
   canonical_reproducible:           true
   canonical_hash_matches_manifest:  true
@@ -52,7 +52,7 @@ checks:
 The canonical hash for the bundled Palermo 1MW demo is always:
 
 ```
-sha256:c2150ae864a62d1bbdc284b81a55494656fff3b218838bab8fc848efa94d9171
+sha256:ed47bc9df77ad56dc0b11f05d365b1a79adaec1f20563bcfa5b37496ca236256
 ```
 
 If your local run produces a different hash, something is wrong with the
@@ -68,7 +68,7 @@ Record ID:        pv-palermo-pv-001-20260515T101500Z
 Timestamp:        2026-05-15T10:15:00Z
 Interval:         15 minutes
 Location:         Palermo, IT
-Source:           pv_simulator / desiree-palermo-sim-v1
+Source:           pv_simulator / nicola-palermo-sim-v1
 
 Telemetry (canonical, integer):
   ghi_w_m2                       554
@@ -82,7 +82,7 @@ Telemetry (canonical, integer):
 Attached events:  1
   - evt-20260515-001 [module_cleaning] started 2026-05-15T08:00:00Z
 
-Canonical hash:   sha256:c2150ae864a62d1bbdc284b81a55494656fff3b218838bab8fc848efa94d9171
+Canonical hash:   sha256:ed47bc9df77ad56dc0b11f05d365b1a79adaec1f20563bcfa5b37496ca236256
 Signature:        algorithm=ed25519 key_ref=key:plant-palermo-001
 Anchor status:    pending
 ```
@@ -111,7 +111,7 @@ verify it with any SHA-256 tool:
 ```bash
 sha256sum data/pv-agent/palermo-pv-001/records/2026/05/15/pv-palermo-pv-001-20260515T101500Z/canonical-record.json
 # Expected:
-# c2150ae864a62d1bbdc284b81a55494656fff3b218838bab8fc848efa94d9171
+# ed47bc9df77ad56dc0b11f05d365b1a79adaec1f20563bcfa5b37496ca236256
 ```
 
 PowerShell:

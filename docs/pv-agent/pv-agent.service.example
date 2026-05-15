@@ -1,0 +1,26 @@
+# Example systemd unit for pv-agent. Not enabled by default.
+# Copy to /etc/systemd/system/pv-agent.service, edit paths, then:
+#   systemctl daemon-reload
+#   systemctl enable --now pv-agent.timer
+
+[Unit]
+Description=IPPAN pv-agent — one PV evidence record per invocation
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+User=pv-agent
+Group=pv-agent
+EnvironmentFile=-/etc/ippan/pv-agent.env
+ExecStart=/usr/local/bin/pv-agent run-once \
+  --config /etc/ippan/pv-agent.toml \
+  --input /var/lib/pv-agent/inputs/latest.json \
+  --events /var/lib/pv-agent/events/recent.json
+NoNewPrivileges=true
+ProtectSystem=full
+ProtectHome=true
+PrivateTmp=true
+
+[Install]
+WantedBy=multi-user.target

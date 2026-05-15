@@ -1,0 +1,35 @@
+/target/
+**/*.rs.bk
+Cargo.lock.bak
+
+# Generated evidence bundles must not be committed
+/data/
+/var/
+
+# Local config and secrets
+/.env
+/.env.*
+*.local.toml
+*.local.json
+local-config/
+
+# Private keys
+*.pem
+*.key
+*.priv
+/keys/
+operator-key*
+demo-key*
+private-key*
+
+# OS / editor
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Test artifacts
+/test-output/
+/tmp/

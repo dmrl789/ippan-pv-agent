@@ -1,0 +1,11 @@
+[
+  {
+    "event_id": "evt-20260515-001",
+    "event_type": "module_cleaning",
+    "started_at": "2026-05-15T08:00:00Z",
+    "ended_at": "2026-05-15T09:00:00Z",
+    "description": "Routine module cleaning completed",
+    "affected_components": ["pv_string_01", "pv_string_02"],
+    "operator": "operator-id-or-key-ref"
+  }
+]

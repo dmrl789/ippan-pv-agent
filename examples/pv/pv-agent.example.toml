@@ -1,0 +1,34 @@
+# Example pv-agent configuration for the Palermo 1MW demo plant.
+#
+# Production deployments must override:
+#   - storage.base_dir       (where evidence bundles live)
+#   - ippan.endpoint         (real IPPANCENT L1 endpoint)
+#   - ippan.admin_token_env  (env var that holds the bearer token)
+#   - ippan.submit_anchors   (set to true ONLY when ready to anchor live)
+#   - key.key_file           (path to the real operator key)
+#   - agent.production_mode  (set to true to enforce non-demo keys)
+
+[agent]
+agent_id = "pv-agent-palermo-001"
+agent_type = "pv_plant_agent"
+plant_id = "palermo-pv-001"
+operator_key_ref = "key:plant-palermo-001"
+production_mode = false
+
+[storage]
+base_dir = "data/pv-agent"
+
+[ippan]
+endpoint = "http://127.0.0.1:18181"
+anchor_path = "/v1/anchors"
+admin_token_env = "IPPAN_ADMIN_TOKEN"
+submit_anchors = false
+
+[events]
+lookback_minutes = 240
+
+[key]
+# Use `pv-agent generate-demo-key --out data/pv-agent/keys/demo-key.json`
+# to create this file. Demo keys are refused in production_mode unless
+# --allow-demo-key is passed.
+key_file = "data/pv-agent/keys/demo-key.json"

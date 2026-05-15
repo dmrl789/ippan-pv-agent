@@ -1,0 +1,22 @@
+{
+  "plant_id": "palermo-pv-001",
+  "timestamp": "2026-05-15T10:15:00Z",
+  "interval_minutes": 15,
+  "location": {
+    "city": "Palermo",
+    "country": "IT"
+  },
+  "source": {
+    "source_type": "pv_simulator",
+    "source_id": "desiree-palermo-sim-v1"
+  },
+  "telemetry": {
+    "ghi_w_m2": "554",
+    "ambient_temperature_c": "20.5",
+    "dc_power_kw": "492.5",
+    "ac_power_kw": "471.6",
+    "meter_power_kw": "463.1",
+    "performance_ratio": "0.859",
+    "energy_since_start_kwh": "463.1"
+  }
+}

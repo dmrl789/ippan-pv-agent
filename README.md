@@ -361,6 +361,12 @@ description of the JSON that the Palermo 991 kWp PVSimulator (pvlib
 operational-events file that accompanies it. The agent's parser is
 aligned to that contract; what follows is a quick reference.
 
+The canonical evidence record written to disk carries the schema
+identifier **`ippan.pv.production.v2`** (bumped from `v1` when the
+data contract migrated to the full 31-field telemetry payload).
+Verifiers and downstream consumers should pin this string when they
+parse `canonical-record.json`.
+
 ### 13.1 What changed vs. the pre-v1.0 minimal schema
 
 | Topic | Pre-v1.0 minimal | v1.0 data contract |

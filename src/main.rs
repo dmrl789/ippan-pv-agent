@@ -156,7 +156,14 @@ fn main() -> ExitCode {
             key_file,
             allow_demo_key,
             force,
-        } => cmd_run_once(&input, events.as_deref(), &config, key_file.as_deref(), allow_demo_key, force),
+        } => cmd_run_once(
+            &input,
+            events.as_deref(),
+            &config,
+            key_file.as_deref(),
+            allow_demo_key,
+            force,
+        ),
         Cmd::Verify { bundle } => cmd_verify(&bundle),
         Cmd::Inspect { bundle } => cmd_inspect(&bundle),
         Cmd::AnchorSubmit {
@@ -265,7 +272,10 @@ fn cmd_demo(
     println!("AC power: {} kW", raw.telemetry.ac_power_kw);
     println!("Meter power: {} kW", raw.telemetry.meter_power_kw);
     println!("Performance ratio: {}", raw.telemetry.performance_ratio);
-    println!("Energy since start: {} kWh", raw.telemetry.energy_since_start_kwh);
+    println!(
+        "Energy since start: {} kWh",
+        raw.telemetry.energy_since_start_kwh
+    );
     println!();
     println!("Canonical record created: YES");
     println!("Signature created: YES");
@@ -359,14 +369,33 @@ fn cmd_verify(bundle: &Path) -> Result<()> {
         println!("l1_reference: {}", reference);
     }
     println!("checks:");
-    println!("  canonical_reproducible:           {}", report.canonical_reproducible);
-    println!("  canonical_hash_matches_manifest:  {}", report.canonical_hash_matches_manifest);
-    println!("  signature_valid:                  {}", report.signature_valid);
-    println!("  manifest_files_intact:            {}", report.manifest_files_intact);
-    println!("  anchor_request_matches:           {}", report.anchor_request_matches);
+    println!(
+        "  canonical_reproducible:           {}",
+        report.canonical_reproducible
+    );
+    println!(
+        "  canonical_hash_matches_manifest:  {}",
+        report.canonical_hash_matches_manifest
+    );
+    println!(
+        "  signature_valid:                  {}",
+        report.signature_valid
+    );
+    println!(
+        "  manifest_files_intact:            {}",
+        report.manifest_files_intact
+    );
+    println!(
+        "  anchor_request_matches:           {}",
+        report.anchor_request_matches
+    );
     match report.anchor_response_matches {
-        Some(true) => println!("  anchor_response_matches:          true (L1 anchor verification: PASS)"),
-        Some(false) => println!("  anchor_response_matches:          false (L1 anchor verification: FAIL)"),
+        Some(true) => {
+            println!("  anchor_response_matches:          true (L1 anchor verification: PASS)")
+        }
+        Some(false) => {
+            println!("  anchor_response_matches:          false (L1 anchor verification: FAIL)")
+        }
         None => println!("  anchor_response_matches:          n/a (pending)"),
     }
     if !report.overall_pass {
@@ -386,7 +415,12 @@ fn cmd_inspect(bundle: &Path) -> Result<()> {
     Ok(())
 }
 
-fn cmd_anchor_submit(bundle: &Path, config_path: &Path, submit_anchor: bool, force: bool) -> Result<()> {
+fn cmd_anchor_submit(
+    bundle: &Path,
+    config_path: &Path,
+    submit_anchor: bool,
+    force: bool,
+) -> Result<()> {
     let cfg = Config::load(config_path)?;
     // Refuse to submit if bundle does not verify.
     let report = verify_local(bundle)?;
@@ -494,7 +528,14 @@ fn cmd_schedule(
     loop {
         iter += 1;
         println!("[schedule] iteration {} starting", iter);
-        match cmd_run_once(input, events_path, config_path, key_file_override, false, false) {
+        match cmd_run_once(
+            input,
+            events_path,
+            config_path,
+            key_file_override,
+            false,
+            false,
+        ) {
             Ok(()) => {}
             Err(e) => eprintln!("[schedule] iteration {} failed: {}", iter, e),
         }

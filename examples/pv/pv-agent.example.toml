@@ -1,4 +1,8 @@
-# Example pv-agent configuration for the Palermo 1MW demo plant.
+# Example pv-agent configuration for the Palermo 991 kWp pilot plant.
+#
+# This configuration follows IPPAN_DATA_SPECIFICATION v1.0. The agent expects
+# a 31-field simulator telemetry payload (decimal-string encoded) plus a
+# structured events.json file with the five canonical event types.
 #
 # Production deployments must override:
 #   - storage.base_dir       (where evidence bundles live)
@@ -25,6 +29,8 @@ admin_token_env = "IPPAN_ADMIN_TOKEN"
 submit_anchors = false
 
 [events]
+# Attach completed events that ended up to four hours before the current
+# interval. Matches the simulator's recommended 240-minute lookback.
 lookback_minutes = 240
 
 [key]

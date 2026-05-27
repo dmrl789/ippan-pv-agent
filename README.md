@@ -115,7 +115,7 @@ Example anchor request body:
   "evidence_bundle_id": "pv-palermo-pv-001-20260515T101500Z",
   "commitment": {
     "algorithm": "sha256",
-    "hash": "ed47bc9df77ad56dc0b11f05d365b1a79adaec1f20563bcfa5b37496ca236256"
+    "hash": "f1f117601eabbe70653267f5fb3a2d018b1e2429010c677c2f89284acca735f1"
   }
 }
 ```
@@ -219,7 +219,7 @@ bytes. You can re-verify it with any SHA-256 tool:
 
 ```bash
 sha256sum data/pv-agent/palermo-pv-001/records/2026/05/15/pv-palermo-pv-001-20260515T101500Z/canonical-record.json
-# → ed47bc9df77ad56dc0b11f05d365b1a79adaec1f20563bcfa5b37496ca236256
+# → f1f117601eabbe70653267f5fb3a2d018b1e2429010c677c2f89284acca735f1
 ```
 
 ## 9. Verifying an evidence bundle
@@ -352,61 +352,151 @@ endpoint; `pv-agent` prints the response verbatim. After a successful
 status check you can re-run `pv-agent verify` to get an updated
 `anchor_response_matches: true` line.
 
-## 13. Connecting a real simulator or meter bridge
+## 13. PVSimulator Palermo 991 kWp data contract
 
-For Phase 1, `pv-agent` accepts JSON input. A simulator or meter
-bridge should produce a file in this shape (decimals as strings —
-this is deliberate, to avoid binary-float ambiguity):
+This repository follows **IPPAN_DATA_SPECIFICATION v1.0**. That
+document — owned by the simulator team — is the authoritative
+description of the JSON that the Palermo 991 kWp PVSimulator (pvlib
++ Open-Meteo) emits at each 15-minute timestep, plus the structured
+operational-events file that accompanies it. The agent's parser is
+aligned to that contract; what follows is a quick reference.
+
+The canonical evidence record written to disk carries the schema
+identifier **`ippan.pv.production.v2`** (bumped from `v1` when the
+data contract migrated to the full 31-field telemetry payload).
+Verifiers and downstream consumers should pin this string when they
+parse `canonical-record.json`.
+
+### 13.1 What changed vs. the pre-v1.0 minimal schema
+
+| Topic | Pre-v1.0 minimal | v1.0 data contract |
+|---|---|---|
+| Telemetry fields | 7 | **31** (POA, cell temp, DC field, kVA/kVAr, O&M state, …) |
+| `location` | `city`, `country` | + `latitude`, `longitude`, `altitude_m` |
+| `source` | `source_type`, `source_id` | + `model`, `weather_provider` |
+| Active events on telemetry | absent | `active_event_ids: string[]` |
+| Event type for inspections | `maintenance` | **`scheduled_maintenance`** (IEC 62446) |
+| `affected_components` | flat strings (`"pv_string_01"`) | structured `{ type, id, strings_offline }` |
+| `events.json` extras | absent | `status`, `impact`, `photos[]`, `root_cause`, `spare_part`, `insurance_claim`, `soiling_reset` |
+
+The pre-v1.0 minimal payload is **rejected** by today's parser with
+a clear "missing field" error. Operators upgrading must extend the
+simulator output, not strip the schema down.
+
+### 13.2 Telemetry payload (one file per 15-minute step)
+
+Every numeric value is a **decimal string** — bare JSON numbers are
+rejected at parse time so that canonical hashing never round-trips
+through binary floats.
 
 ```json
 {
   "plant_id": "palermo-pv-001",
-  "timestamp": "2026-05-15T10:15:00Z",
+  "timestamp": "2026-05-20T12:15:00Z",
   "interval_minutes": 15,
   "location": {
     "city": "Palermo",
-    "country": "IT"
+    "country": "IT",
+    "latitude": "38.1157",
+    "longitude": "13.3615",
+    "altitude_m": "14"
   },
   "source": {
     "source_type": "pv_simulator",
-    "source_id": "nicola-palermo-sim-v1"
+    "source_id": "pvlib-openmeteo-palermo-v2",
+    "model": "pvlib-CEC-Sandia",
+    "weather_provider": "open-meteo"
   },
   "telemetry": {
     "ghi_w_m2": "554",
+    "dni_w_m2": "680",
+    "dhi_w_m2": "120",
     "ambient_temperature_c": "20.5",
-    "dc_power_kw": "492.5",
-    "ac_power_kw": "471.6",
-    "meter_power_kw": "463.1",
-    "performance_ratio": "0.859",
-    "energy_since_start_kwh": "463.1"
-  }
+    "cell_temperature_c": "36.20",
+    "humidity_pct": "55.0",
+    "wind_speed_ms": "3.200",
+    "precipitation_mm": "0.00",
+    "cloudcover_pct": "15.0",
+    "solar_elevation_deg": "52.300",
+    "solar_azimuth_deg": "185.400",
+    "poa_global_w_m2": "612",
+    "poa_direct_w_m2": "480",
+    "poa_diffuse_w_m2": "132",
+    "dc_string_voltage_v": "372.10",
+    "dc_string_current_a": "8.880",
+    "dc_array_voltage_v": "372.10",
+    "dc_power_kw": "492.5000",
+    "ac_power_kw": "471.6000",
+    "inverter_efficiency_pct": "95.780",
+    "meter_power_kw": "463.1000",
+    "apparent_power_kva": "472.5510",
+    "reactive_power_kvar": "94.8200",
+    "grid_voltage_v": "400.0",
+    "grid_frequency_hz": "50.0",
+    "performance_ratio": "0.8590",
+    "capacity_factor_pct": "47.588",
+    "energy_since_start_kwh": "463.100",
+    "strings_available": "300",
+    "derating_factor": "1.0000",
+    "soiling_factor": "0.9985"
+  },
+  "active_event_ids": []
 }
 ```
 
-Events accompany the reading in a second file (an array, possibly
-empty):
+A complete example lives at
+[examples/pv/palermo-telemetry.json](examples/pv/palermo-telemetry.json),
+and an explicitly-invalid example showing the JSON-numbers form is
+at
+[examples/pv/palermo-telemetry-invalid-json-numbers.json](examples/pv/palermo-telemetry-invalid-json-numbers.json)
+(referenced by tests to pin the rejection contract).
+
+### 13.3 Events payload (`events.json`)
+
+A JSON array of operational events. The agent attaches events to a
+record when they overlap the current interval, when they ended
+within `events.lookback_minutes` (recommended **240 min**), or when
+they appear in `active_event_ids` on the telemetry payload.
+
+The five canonical `event_type` values, all aligned to IEC 62446 /
+the simulator's `events.yaml`:
+
+- `scheduled_maintenance` — annual inspection, thermal imaging,
+  firmware update, torque check (was `maintenance` pre-v1.0).
+- `failure` — string open-circuit, connector fault, AFCI trip, fuse
+  blow.
+- `module_cleaning` — wet or dry cleaning. Carries
+  `soiling_reset: true`.
+- `corrective_maintenance` — planned repair following a detected
+  fault (e.g. IGBT replacement). Carries `spare_part`.
+- `replacement` — module / equipment replacement after hail, EoL.
+  Carries `spare_part` and (when insured) `insurance_claim`.
+
+`affected_components` is a list of structured objects:
 
 ```json
-[
-  {
-    "event_id": "evt-20260515-001",
-    "event_type": "module_cleaning",
-    "started_at": "2026-05-15T08:00:00Z",
-    "ended_at": "2026-05-15T09:00:00Z",
-    "description": "Routine module cleaning completed",
-    "affected_components": ["pv_string_01", "pv_string_02"],
-    "operator": "operator-id-or-key-ref"
-  }
-]
+{ "type": "inverter", "id": "INV-03", "strings_offline": 30 }
+{ "type": "string",   "id": "INV-05/STR-07", "strings_offline": 1 }
+{ "type": "plant",    "id": "all", "strings_offline": 150 }
 ```
 
-Then run:
+Component IDs are validated: `INV-01` through `INV-10`, each with
+`STR-01` through `STR-30`. `photo_type` values are restricted to
+`pre_intervention`, `in_progress`, `post_intervention`,
+`fault_finding`, `diagnostics`.
+
+A full example per event type is in
+[examples/pv/events/](examples/pv/events/), and a representative
+combined `events.json` is at
+[examples/pv/palermo-events.json](examples/pv/palermo-events.json).
+
+### 13.4 Running once with these inputs
 
 ```bash
 target/release/pv-agent run-once \
-  --input path/to/telemetry.json \
-  --events path/to/events.json \
-  --config path/to/pv-agent.toml
+  --input examples/pv/palermo-telemetry.json \
+  --events examples/pv/palermo-events.json \
+  --config examples/pv/pv-agent.example.toml
 ```
 
 In Phase 2, this input can be supplied directly by an adapter to the
@@ -617,7 +707,7 @@ And in-depth reference material lives under
 
 1. **Run the Palermo 1MW demo locally** to confirm the binary
    produces the expected canonical hash:
-   `sha256:ed47bc9df77ad56dc0b11f05d365b1a79adaec1f20563bcfa5b37496ca236256`.
+   `sha256:f1f117601eabbe70653267f5fb3a2d018b1e2429010c677c2f89284acca735f1`.
 2. **Produce one real 15-minute record** from your own simulator
    output via `pv-agent run-once`. Verify it locally.
 3. **Walk the pilot checklist** in

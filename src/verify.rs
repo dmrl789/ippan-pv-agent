@@ -2,7 +2,7 @@
 
 use crate::bundle::{
     read_anchor_request, read_anchor_response_raw, read_canonical_bytes, read_envelope,
-    read_manifest, write_verification_report, CANONICAL_FILE, ANCHOR_REQ_FILE, EVENTS_FILE,
+    read_manifest, write_verification_report, ANCHOR_REQ_FILE, CANONICAL_FILE, EVENTS_FILE,
     SIGNATURE_FILE, SOURCE_META_FILE, VERIFY_REPORT_SCHEMA,
 };
 use crate::canonical::to_canonical_bytes;
@@ -86,10 +86,9 @@ pub fn verify_local(bundle_dir: &Path) -> Result<VerificationReport> {
 
     // 5. Anchor request commitment matches canonical hash.
     let anchor_req = read_anchor_request(bundle_dir)?;
-    let anchor_request_matches =
-        anchor_req.commitment.algorithm == "sha256"
-            && anchor_req.commitment.hash == manifest.canonical_hash
-            && anchor_req.evidence_bundle_id == manifest.record_id;
+    let anchor_request_matches = anchor_req.commitment.algorithm == "sha256"
+        && anchor_req.commitment.hash == manifest.canonical_hash
+        && anchor_req.evidence_bundle_id == manifest.record_id;
 
     // 6. Anchor response, if present and non-pending, should reference the
     //    same hash.
@@ -111,7 +110,9 @@ pub fn verify_local(bundle_dir: &Path) -> Result<VerificationReport> {
                 .and_then(|v| v.as_str())
                 .map(|s| s.to_string());
             match anchor_hash {
-                Some(h) => Some(h == manifest.canonical_hash || h == strip_prefix(&manifest.canonical_hash)),
+                Some(h) => Some(
+                    h == manifest.canonical_hash || h == strip_prefix(&manifest.canonical_hash),
+                ),
                 None => Some(true), // No anchor_hash echoed back; treat as not contradicting.
             }
         }

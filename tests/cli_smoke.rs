@@ -12,12 +12,7 @@ fn demo_creates_a_bundle_that_verifies() {
     let base = dir.path().join("data/pv-agent");
 
     pv_agent()
-        .args([
-            "demo",
-            "--plant",
-            "palermo-1mw",
-            "--base-dir",
-        ])
+        .args(["demo", "--plant", "palermo-1mw", "--base-dir"])
         .arg(&base)
         .assert()
         .success()
@@ -25,8 +20,12 @@ fn demo_creates_a_bundle_that_verifies() {
         .stdout(predicate::str::contains("Evidence bundle saved: YES"))
         .stdout(predicate::str::contains("IPPAN L1 anchor submitted: NO"));
 
-    let bundle = base.join("palermo-pv-001/records/2026/05/15/pv-palermo-pv-001-20260515T101500Z");
-    assert!(bundle.exists(), "bundle directory should exist at {}", bundle.display());
+    let bundle = base.join("palermo-pv-001/records/2026/05/20/pv-palermo-pv-001-20260520T121500Z");
+    assert!(
+        bundle.exists(),
+        "bundle directory should exist at {}",
+        bundle.display()
+    );
 
     pv_agent()
         .args(["verify", "--bundle"])
@@ -45,7 +44,7 @@ fn inspect_does_not_leak_secrets() {
         .arg(&base)
         .assert()
         .success();
-    let bundle = base.join("palermo-pv-001/records/2026/05/15/pv-palermo-pv-001-20260515T101500Z");
+    let bundle = base.join("palermo-pv-001/records/2026/05/20/pv-palermo-pv-001-20260520T121500Z");
 
     let out = pv_agent()
         .args(["inspect", "--bundle"])
@@ -67,7 +66,11 @@ fn inspect_does_not_leak_secrets() {
         "Bearer ",
         "IPPAN_ADMIN_TOKEN=",
     ] {
-        assert!(!text.contains(forbidden), "inspect output leaked `{}`", forbidden);
+        assert!(
+            !text.contains(forbidden),
+            "inspect output leaked `{}`",
+            forbidden
+        );
     }
 }
 
@@ -134,7 +137,7 @@ key_file = "{}"
         .stdout(predicate::str::contains("Record ID:"))
         .stdout(predicate::str::contains("Canonical hash:"));
 
-    let bundle = base.join("palermo-pv-001/records/2026/05/15/pv-palermo-pv-001-20260515T101500Z");
+    let bundle = base.join("palermo-pv-001/records/2026/05/20/pv-palermo-pv-001-20260520T121500Z");
     pv_agent()
         .args(["verify", "--bundle"])
         .arg(&bundle)
@@ -152,7 +155,7 @@ fn verify_fails_after_canonical_record_is_tampered() {
         .arg(&base)
         .assert()
         .success();
-    let bundle = base.join("palermo-pv-001/records/2026/05/15/pv-palermo-pv-001-20260515T101500Z");
+    let bundle = base.join("palermo-pv-001/records/2026/05/20/pv-palermo-pv-001-20260520T121500Z");
     let canonical = bundle.join("canonical-record.json");
     let mut bytes = std::fs::read(&canonical).unwrap();
     bytes.push(b' ');
@@ -175,7 +178,7 @@ fn anchor_status_without_reference_errors_cleanly() {
         .arg(&base)
         .assert()
         .success();
-    let bundle = base.join("palermo-pv-001/records/2026/05/15/pv-palermo-pv-001-20260515T101500Z");
+    let bundle = base.join("palermo-pv-001/records/2026/05/20/pv-palermo-pv-001-20260520T121500Z");
 
     let cfg = dir.path().join("pv-agent.toml");
     std::fs::write(

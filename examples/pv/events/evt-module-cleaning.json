@@ -1,0 +1,18 @@
+{
+  "event_id": "EVT-002",
+  "event_type": "module_cleaning",
+  "started_at": "2026-05-10T04:00:00Z",
+  "ended_at": "2026-05-10T09:00:00Z",
+  "description": "Full-plant module cleaning — post-pollen season",
+  "status": "completed",
+  "affected_components": [
+    { "type": "plant", "id": "all", "strings_offline": 150 }
+  ],
+  "impact": {
+    "strings_offline": 150,
+    "power_reduction_pct": 50
+  },
+  "soiling_reset": true,
+  "operator": "Cleaning Crew A",
+  "notes": "Rotating wet-clean with demineralised water. Sections cleaned in groups of 5 strings at a time. Half the plant offline at any instant plus 50% reduction on the active half. Expected yield uplift +2.5–4 % vs dirty baseline. Soiling accumulation reset to zero after completion."
+}

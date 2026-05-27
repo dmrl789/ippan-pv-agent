@@ -129,7 +129,9 @@ fn submit_sends_commitment_only_with_bearer_header() {
     let res = anchor::submit(&bundle, &ippan, true, false).expect("submit ok");
     assert_eq!(res.response_value["status"], "submitted");
 
-    let captured = rx.recv_timeout(std::time::Duration::from_secs(5)).expect("captured");
+    let captured = rx
+        .recv_timeout(std::time::Duration::from_secs(5))
+        .expect("captured");
     assert_eq!(captured.method, "POST");
     assert_eq!(captured.path, "/v1/anchors");
     assert_eq!(
@@ -212,7 +214,10 @@ fn failed_anchor_keeps_local_evidence_intact() {
     let _ = anchor::submit(&bundle, &ippan, true, false);
 
     let after = std::fs::read(bundle.join("canonical-record.json")).unwrap();
-    assert_eq!(before, after, "canonical record must not be modified by failed anchor");
+    assert_eq!(
+        before, after,
+        "canonical record must not be modified by failed anchor"
+    );
 }
 
 #[test]
@@ -240,7 +245,9 @@ fn second_submit_refused_unless_force() {
 
     anchor::submit(&bundle, &ippan, true, false).expect("first submit");
     let err = anchor::submit(&bundle, &ippan, true, false).unwrap_err();
-    assert!(err.to_string().contains("already has a non-pending anchor response"));
+    assert!(err
+        .to_string()
+        .contains("already has a non-pending anchor response"));
 
     std::env::remove_var(TOKEN_ENV_T5);
 }

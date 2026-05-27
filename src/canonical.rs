@@ -98,7 +98,10 @@ mod tests {
     fn sorts_object_keys() {
         let v = json!({"b": 1, "a": 2, "c": 3});
         let bytes = to_canonical_bytes(&v).unwrap();
-        assert_eq!(std::str::from_utf8(&bytes).unwrap(), r#"{"a":2,"b":1,"c":3}"#);
+        assert_eq!(
+            std::str::from_utf8(&bytes).unwrap(),
+            r#"{"a":2,"b":1,"c":3}"#
+        );
     }
 
     #[test]
@@ -128,10 +131,7 @@ mod tests {
     fn escapes_strings() {
         let v = json!({"k": "a\"b\\c\n"});
         let bytes = to_canonical_bytes(&v).unwrap();
-        assert_eq!(
-            std::str::from_utf8(&bytes).unwrap(),
-            r#"{"k":"a\"b\\c\n"}"#
-        );
+        assert_eq!(std::str::from_utf8(&bytes).unwrap(), r#"{"k":"a\"b\\c\n"}"#);
     }
 
     #[test]

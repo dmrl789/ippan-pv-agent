@@ -1,0 +1,15 @@
+{
+  "event_id": "EVT-004",
+  "event_type": "corrective_maintenance",
+  "started_at": "2026-05-12T06:00:00Z",
+  "ended_at": "2026-05-12T16:00:00Z",
+  "description": "IGBT module replacement — inverter INV-08",
+  "status": "completed",
+  "affected_components": [
+    { "type": "inverter", "id": "INV-08", "strings_offline": 30 }
+  ],
+  "impact": { "strings_offline": 30, "power_reduction_pct": 0 },
+  "operator": "ABB Service Engineer — Contract #SRV-2026-0042",
+  "spare_part": "ABB IGBT Module 3HNA024931-001 (2 pcs)",
+  "notes": "INV-08 triggered AFCI protection and shut down on 2026-05-11 at 14:22. Remote diagnostics confirmed IGBT fault (error code E017). Root cause: thermal fatigue after 4 years of service. ABB engineer dispatched. Test run successful after replacement."
+}

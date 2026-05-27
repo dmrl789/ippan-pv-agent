@@ -118,7 +118,9 @@ pub fn status(bundle_dir: &Path, ippan: &IppanConfig) -> Result<Value> {
     let reference = resp
         .get("reference")
         .and_then(|r| r.as_str())
-        .ok_or_else(|| Error::Anchor("no anchor reference in bundle (not yet submitted?)".into()))?;
+        .ok_or_else(|| {
+            Error::Anchor("no anchor reference in bundle (not yet submitted?)".into())
+        })?;
 
     let token = if let Some(env_name) = &ippan.admin_token_env {
         std::env::var(env_name).ok().filter(|v| !v.is_empty())

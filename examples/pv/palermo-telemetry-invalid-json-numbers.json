@@ -1,0 +1,52 @@
+{
+  "plant_id": "palermo-pv-001",
+  "timestamp": "2026-05-20T12:15:00Z",
+  "interval_minutes": 15,
+  "location": {
+    "city": "Palermo",
+    "country": "IT",
+    "latitude": "38.1157",
+    "longitude": "13.3615",
+    "altitude_m": "14"
+  },
+  "source": {
+    "source_type": "pv_simulator",
+    "source_id": "pvlib-openmeteo-palermo-v2",
+    "model": "pvlib-CEC-Sandia",
+    "weather_provider": "open-meteo"
+  },
+  "telemetry": {
+    "ghi_w_m2": 554,
+    "dni_w_m2": 680,
+    "dhi_w_m2": 120,
+    "ambient_temperature_c": 20.5,
+    "cell_temperature_c": 36.20,
+    "humidity_pct": 55.0,
+    "wind_speed_ms": 3.200,
+    "precipitation_mm": 0.00,
+    "cloudcover_pct": 15.0,
+    "solar_elevation_deg": 52.300,
+    "solar_azimuth_deg": 185.400,
+    "poa_global_w_m2": 612,
+    "poa_direct_w_m2": 480,
+    "poa_diffuse_w_m2": 132,
+    "dc_string_voltage_v": 372.10,
+    "dc_string_current_a": 8.880,
+    "dc_array_voltage_v": 372.10,
+    "dc_power_kw": 492.5000,
+    "ac_power_kw": 471.6000,
+    "inverter_efficiency_pct": 95.780,
+    "meter_power_kw": 463.1000,
+    "apparent_power_kva": 472.5510,
+    "reactive_power_kvar": 94.8200,
+    "grid_voltage_v": 400.0,
+    "grid_frequency_hz": 50.0,
+    "performance_ratio": 0.8590,
+    "capacity_factor_pct": 47.588,
+    "energy_since_start_kwh": 463.100,
+    "strings_available": 300,
+    "derating_factor": 1.0000,
+    "soiling_factor": 0.9985
+  },
+  "active_event_ids": []
+}

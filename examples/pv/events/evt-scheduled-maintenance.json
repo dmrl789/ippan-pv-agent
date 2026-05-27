@@ -1,0 +1,14 @@
+{
+  "event_id": "EVT-001",
+  "event_type": "scheduled_maintenance",
+  "started_at": "2026-05-08T06:00:00Z",
+  "ended_at": "2026-05-08T14:00:00Z",
+  "description": "Annual inspection — inverter INV-03 (thermal imaging + torque check)",
+  "status": "completed",
+  "affected_components": [
+    { "type": "inverter", "id": "INV-03", "strings_offline": 30 }
+  ],
+  "impact": { "strings_offline": 30, "power_reduction_pct": 0 },
+  "operator": "Mario Rossi",
+  "notes": "Annual preventive maintenance per IEC 62446. IR thermography: no anomalies. Firmware updated to v3.12. Cooling fan replaced."
+}

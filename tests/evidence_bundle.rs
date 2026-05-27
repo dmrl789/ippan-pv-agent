@@ -45,7 +45,11 @@ fn bundle_creates_all_required_files() {
         EVENTS_FILE,
         ANCHOR_REQ_FILE,
     ] {
-        assert!(listed.contains(&required), "manifest must list {}", required);
+        assert!(
+            listed.contains(&required),
+            "manifest must list {}",
+            required
+        );
     }
 }
 
@@ -105,14 +109,26 @@ fn verification_fails_when_signature_envelope_modified() {
     .unwrap();
 
     let p = built.bundle_dir.join(SIGNATURE_FILE);
-    let mut env: serde_json::Value =
-        serde_json::from_slice(&fs::read(&p).unwrap()).unwrap();
+    let mut env: serde_json::Value = serde_json::from_slice(&fs::read(&p).unwrap()).unwrap();
     // Flip a single base64 char in the signature value.
-    let sig = env["signature"]["signature_value"].as_str().unwrap().to_string();
+    let sig = env["signature"]["signature_value"]
+        .as_str()
+        .unwrap()
+        .to_string();
     let flipped: String = sig
         .chars()
         .enumerate()
-        .map(|(i, c)| if i == 0 { if c == 'A' { 'B' } else { 'A' } } else { c })
+        .map(|(i, c)| {
+            if i == 0 {
+                if c == 'A' {
+                    'B'
+                } else {
+                    'A'
+                }
+            } else {
+                c
+            }
+        })
         .collect();
     env["signature"]["signature_value"] = serde_json::Value::String(flipped);
     fs::write(&p, serde_json::to_vec_pretty(&env).unwrap()).unwrap();
@@ -141,7 +157,9 @@ fn verification_fails_when_manifest_hash_lies() {
     let files = m["files"].as_array_mut().unwrap();
     for f in files.iter_mut() {
         if f["path"] == "canonical-record.json" {
-            f["sha256"] = serde_json::Value::String("sha256:0000000000000000000000000000000000000000000000000000000000000000".into());
+            f["sha256"] = serde_json::Value::String(
+                "sha256:0000000000000000000000000000000000000000000000000000000000000000".into(),
+            );
         }
     }
     fs::write(&p, serde_json::to_vec_pretty(&m).unwrap()).unwrap();

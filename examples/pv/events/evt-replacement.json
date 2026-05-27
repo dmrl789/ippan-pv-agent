@@ -1,0 +1,19 @@
+{
+  "event_id": "EVT-005",
+  "event_type": "replacement",
+  "started_at": "2026-05-15T05:00:00Z",
+  "ended_at": "2026-05-15T15:00:00Z",
+  "description": "Module replacement — hail damage on strings 12–15, INV-02",
+  "status": "completed",
+  "affected_components": [
+    { "type": "string", "id": "INV-02/STR-12", "strings_offline": 1 },
+    { "type": "string", "id": "INV-02/STR-13", "strings_offline": 1 },
+    { "type": "string", "id": "INV-02/STR-14", "strings_offline": 1 },
+    { "type": "string", "id": "INV-02/STR-15", "strings_offline": 1 }
+  ],
+  "impact": { "strings_offline": 4, "power_reduction_pct": 0 },
+  "operator": "Installation Crew B",
+  "spare_part": "Canadian Solar CS6X-330P × 40 units",
+  "insurance_claim": "CLM-2026-HAIL-0088",
+  "notes": "40 modules on strings 12–15 of INV-02 damaged by hailstorm on 2026-05-13 (hailstone diameter ~3.5 cm). Insurance claim filed. Replacement modules from same production batch to maintain electrical matching. Post-installation IV curve check passed."
+}

@@ -18,7 +18,11 @@ pv-agent export --bundle <existing-bundle-dir> --format agentos --out ./agentos-
   `pv-agent demo` / `run-once` (contains `manifest.json`,
   `signature-envelope.json`, `canonical-record.json`, `source-metadata.json`,
   and optionally `anchor-response.json`).
-- `--format agentos` — the only supported format (default).
+- `--format` — one of:
+  - `agentos` (default) — the bare `ippan.pv.evidence_bundle.v1` bundle.
+  - `agentos-import` — the `{ bundle, signed_payload }` wrapper that also ships
+    the exact signed canonical bytes so AgentOS can verify the signature
+    (see [Verifiable import](#verifiable-import-format-agentos-import) below).
 - `--out` — the JSON file to write.
 
 ## What the bundle contains
@@ -51,14 +55,59 @@ submits nothing to L1.
 ## Signature & AgentOS verification
 
 The bundle carries the agent's Ed25519 signature over the **canonical record
-bytes**. AgentOS reports this as `signature_status: present_not_verified` —
-it does not yet re-derive those canonical bytes to verify the signature. The
-`files.signed_payload` pointer (`canonical-record.json`) names exactly which
-bytes were signed, so a future AgentOS verification path can verify it.
+bytes**. Imported on its own (bare `agentos` format), AgentOS reports
+`signature_status: present_not_verified` — it has the signature metadata but
+not the bytes that were signed. The `files.signed_payload` pointer
+(`canonical-record.json`) names exactly which bytes were signed.
 
-> The bundle is **designed to be accepted by AgentOS Energy's import
-> validator**. This document does not claim that AgentOS cryptographically
-> verifies the PV signature today.
+## Verifiable import (`--format agentos-import`)
+
+To let AgentOS reach `signature_status: verified`, export the **import
+wrapper**, which carries the exact signed bytes alongside the bundle:
+
+```bash
+pv-agent export --bundle <bundle-dir> --format agentos-import --out ./agentos-import.json
+```
+
+Output shape (matches the AgentOS import route
+`POST /api/energy/import-pv-agent-bundle`):
+
+```jsonc
+{
+  "bundle": { /* ippan.pv.evidence_bundle.v1 — identical to the bare export */ },
+  "signed_payload": {
+    "encoding": "utf8",                 // or "base64" if the bytes are not valid UTF-8
+    "canonical_bytes": "…",             // the EXACT bytes that were signed
+    "content_type": "application/json",
+    "description": "canonical-record.json"
+  }
+}
+```
+
+Key guarantees:
+
+- **Exact bytes, no regeneration.** `signed_payload.canonical_bytes` is the
+  verbatim content of the bundle's `canonical-record.json` — the precise bytes
+  the agent signed. The agent does not reformat, re-canonicalize, or regenerate
+  them. AgentOS verifies them **verbatim**.
+- **`verified` only on success.** AgentOS verifies the Ed25519 signature
+  (`signature.signer` / `signature.signature`) against the supplied bytes and
+  reports `verified` only when it succeeds, `failed` when it does not.
+- **The signed bytes are the full canonical record.** Because verification
+  requires the exact signed input, the wrapper necessarily includes the
+  canonical record contents (plant id + telemetry). This is inherent to
+  signature verification — use the bare `agentos` format for the
+  validate + preview path when you do not need verification.
+- **Encoding.** The canonical record is valid UTF-8 by construction, so it
+  ships as `encoding: "utf8"`; the agent falls back to `base64` only if the
+  bytes were ever not valid UTF-8.
+
+A real, verifying wrapper example (built from the fictional Palermo demo) is at
+[`examples/agentos/pv-agent-import.example.json`](../../examples/agentos/pv-agent-import.example.json).
+
+> The bare `agentos` format is unchanged, so existing consumers are
+> unaffected. This milestone adds **no** persistence, anchoring, L1 contact,
+> SCADA/inverter integration, or live submission.
 
 ## Hash format
 

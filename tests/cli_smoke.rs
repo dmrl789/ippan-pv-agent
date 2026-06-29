@@ -170,6 +170,65 @@ fn verify_fails_after_canonical_record_is_tampered() {
 }
 
 #[test]
+fn export_supports_bundle_and_import_wrapper_formats() {
+    let dir = tempdir().unwrap();
+    let base = dir.path().join("data/pv-agent");
+    pv_agent()
+        .args(["demo", "--plant", "palermo-1mw", "--base-dir"])
+        .arg(&base)
+        .assert()
+        .success();
+    let bundle = base.join("palermo-pv-001/records/2026/05/20/pv-palermo-pv-001-20260520T121500Z");
+
+    // Default `agentos` format → bare bundle (existing path, unchanged).
+    let bare_out = dir.path().join("bundle.json");
+    pv_agent()
+        .args(["export", "--bundle"])
+        .arg(&bundle)
+        .args(["--format", "agentos", "--out"])
+        .arg(&bare_out)
+        .assert()
+        .success()
+        .stdout(predicate::str::contains("present_not_verified"));
+    let bare: serde_json::Value =
+        serde_json::from_slice(&std::fs::read(&bare_out).unwrap()).unwrap();
+    assert_eq!(bare["schema_version"], "ippan.pv.evidence_bundle.v1");
+    assert!(bare.get("signed_payload").is_none());
+
+    // `agentos-import` format → { bundle, signed_payload } wrapper.
+    let wrap_out = dir.path().join("import.json");
+    pv_agent()
+        .args(["export", "--bundle"])
+        .arg(&bundle)
+        .args(["--format", "agentos-import", "--out"])
+        .arg(&wrap_out)
+        .assert()
+        .success()
+        .stdout(predicate::str::contains("signed_payload:   included"));
+    let wrap: serde_json::Value =
+        serde_json::from_slice(&std::fs::read(&wrap_out).unwrap()).unwrap();
+    assert_eq!(
+        wrap["bundle"]["schema_version"],
+        "ippan.pv.evidence_bundle.v1"
+    );
+    assert_eq!(wrap["signed_payload"]["encoding"], "utf8");
+    assert!(wrap["signed_payload"]["canonical_bytes"]
+        .as_str()
+        .map(|s| !s.is_empty())
+        .unwrap_or(false));
+
+    // Unknown format is rejected.
+    pv_agent()
+        .args(["export", "--bundle"])
+        .arg(&bundle)
+        .args(["--format", "nope", "--out"])
+        .arg(dir.path().join("x.json"))
+        .assert()
+        .failure()
+        .stderr(predicate::str::contains("unsupported export format"));
+}
+
+#[test]
 fn anchor_status_without_reference_errors_cleanly() {
     let dir = tempdir().unwrap();
     let base = dir.path().join("data/pv-agent");

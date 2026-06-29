@@ -1,0 +1,52 @@
+{
+  "bundle": {
+    "schema_version": "ippan.pv.evidence_bundle.v1",
+    "agent": {
+      "agent_id": "pv-agent-palermo-001",
+      "agent_version": "0.1.0",
+      "public_key": "jM5d3HYOi/quBpU1o+E/u0mGWibOdWdXFdhInMenTos="
+    },
+    "plant": {
+      "asset_ref": "earef:c5875ebfe5bab63eeb9e897b1a96cafc",
+      "technology": "solar_pv",
+      "location_ref": "Palermo, IT"
+    },
+    "period": {
+      "start": "2026-05-20T12:15:00Z",
+      "end": "2026-05-20T12:30:00Z",
+      "interval_minutes": 15
+    },
+    "summary": {
+      "record_count": 1,
+      "total_energy_kwh": 463.1,
+      "anomalies_count": 1
+    },
+    "hashes": {
+      "data_hash": "sha256:f1f117601eabbe70653267f5fb3a2d018b1e2429010c677c2f89284acca735f1",
+      "commitment_hash": "sha256:f1f117601eabbe70653267f5fb3a2d018b1e2429010c677c2f89284acca735f1",
+      "canonicalization": "ippan.pv.canonical (sorted-keys, no-floats, utf-8)"
+    },
+    "signature": {
+      "algorithm": "ed25519",
+      "signer": "jM5d3HYOi/quBpU1o+E/u0mGWibOdWdXFdhInMenTos=",
+      "signature": "YJrRyvdLj6FOjpydXxNRyCdzAYTbI66YpAsO4fdIKW/7Xdlc+5hr7qnO7i8qvmm9ck5I9JvOND3YnXI38yMWBA=="
+    },
+    "anchor": {
+      "mode": "dry_run",
+      "anchor_hash": "sha256:f1f117601eabbe70653267f5fb3a2d018b1e2429010c677c2f89284acca735f1",
+      "submission_status": "dry_run_only",
+      "verification_status": "not_checked"
+    },
+    "files": {
+      "manifest": "manifest.json",
+      "data_summary": "source-metadata.json",
+      "signed_payload": "canonical-record.json"
+    }
+  },
+  "signed_payload": {
+    "encoding": "utf8",
+    "canonical_bytes": "{\"active_event_ids\":[],\"events\":[{\"affected_components\":[{\"id\":\"INV-03\",\"strings_offline\":30,\"type\":\"inverter\"}],\"description\":\"Annual inspection — inverter INV-03 (thermal imaging + torque check)\",\"ended_at\":\"2026-05-20T11:00:00Z\",\"event_id\":\"EVT-001\",\"event_type\":\"scheduled_maintenance\",\"impact\":{\"derating_at_start\":\"0.9000\",\"power_reduction_pct\":0,\"strings_offline\":30},\"notes\":\"Annual preventive maintenance per IEC 62446. Visual inspection, IR thermography of all connectors, torque verification, AFCI self-test, firmware updated to v3.12, cooling fan replaced.\",\"operator\":\"Mario Rossi\",\"photos\":[{\"description\":\"INV-03 cabinet before maintenance\",\"filename\":\"docs/EVT-001_pre_intervention.jpg\",\"photo_id\":\"P001-1\",\"photo_type\":\"pre_intervention\",\"timestamp\":\"2026-05-20T07:55:00Z\"},{\"description\":\"IR scan — no anomalies found on DC terminals\",\"filename\":\"docs/EVT-001_ir_scan.jpg\",\"photo_id\":\"P001-2\",\"photo_type\":\"diagnostics\",\"timestamp\":\"2026-05-20T09:30:00Z\"},{\"description\":\"INV-03 after maintenance, firmware v3.12 confirmed\",\"filename\":\"docs/EVT-001_post_intervention.jpg\",\"photo_id\":\"P001-3\",\"photo_type\":\"post_intervention\",\"timestamp\":\"2026-05-20T10:50:00Z\"}],\"started_at\":\"2026-05-20T08:00:00Z\",\"status\":\"completed\"}],\"interval_minutes\":15,\"location\":{\"altitude_m\":\"14\",\"city\":\"Palermo\",\"country\":\"IT\",\"latitude\":\"38.1157\",\"longitude\":\"13.3615\"},\"plant_id\":\"palermo-pv-001\",\"record_id\":\"pv-palermo-pv-001-20260520T121500Z\",\"schema\":\"ippan.pv.production.v2\",\"source\":{\"model\":\"pvlib-CEC-Sandia\",\"source_id\":\"pvlib-openmeteo-palermo-v2\",\"source_type\":\"pv_simulator\",\"weather_provider\":\"open-meteo\"},\"telemetry\":{\"ac_power_milliwatt\":471600000,\"ambient_temperature_milli_c\":20500,\"apparent_power_milli_va\":472551000,\"capacity_factor_milli_pct\":47588,\"cell_temperature_milli_c\":36200,\"cloudcover_milli_pct\":15000,\"dc_array_voltage_milli_v\":372100,\"dc_power_milliwatt\":492500000,\"dc_string_current_milli_a\":8880,\"dc_string_voltage_milli_v\":372100,\"derating_factor_ppm\":1000000,\"dhi_w_m2\":120,\"dni_w_m2\":680,\"energy_since_start_wh\":463100,\"ghi_w_m2\":554,\"grid_frequency_milli_hz\":50000,\"grid_voltage_milli_v\":400000,\"humidity_milli_pct\":55000,\"inverter_efficiency_milli_pct\":95780,\"meter_power_milliwatt\":463100000,\"performance_ratio_ppm\":859000,\"poa_diffuse_w_m2\":132,\"poa_direct_w_m2\":480,\"poa_global_w_m2\":612,\"precipitation_milli_mm\":0,\"reactive_power_milli_var\":94820000,\"soiling_factor_ppm\":998500,\"solar_azimuth_milli_deg\":185400,\"solar_elevation_milli_deg\":52300,\"strings_available\":300,\"wind_speed_milli_ms\":3200},\"timestamp\":\"2026-05-20T12:15:00Z\"}",
+    "content_type": "application/json",
+    "description": "canonical-record.json"
+  }
+}

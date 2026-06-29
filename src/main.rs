@@ -1,6 +1,7 @@
 //! pv-agent CLI entry point.
 
 use clap::{Parser, Subcommand};
+use ippan_pv_agent::agentos_bundle;
 use ippan_pv_agent::anchor;
 use ippan_pv_agent::bundle::{build_bundle, BuildOptions};
 use ippan_pv_agent::config::{
@@ -79,6 +80,20 @@ enum Cmd {
     Inspect {
         #[arg(long)]
         bundle: PathBuf,
+    },
+
+    /// Export an AgentOS-compatible evidence bundle
+    /// (`ippan.pv.evidence_bundle.v1`) from a local bundle directory.
+    Export {
+        /// Path to an existing local evidence bundle directory.
+        #[arg(long)]
+        bundle: PathBuf,
+        /// Output format. Only `agentos` is supported.
+        #[arg(long, default_value = "agentos")]
+        format: String,
+        /// Output JSON file to write.
+        #[arg(long)]
+        out: PathBuf,
     },
 
     /// Submit a bundle commitment to IPPAN L1.
@@ -166,6 +181,11 @@ fn main() -> ExitCode {
         ),
         Cmd::Verify { bundle } => cmd_verify(&bundle),
         Cmd::Inspect { bundle } => cmd_inspect(&bundle),
+        Cmd::Export {
+            bundle,
+            format,
+            out,
+        } => cmd_export(&bundle, &format, &out),
         Cmd::AnchorSubmit {
             bundle,
             config,
@@ -413,6 +433,44 @@ fn cmd_inspect(bundle: &Path) -> Result<()> {
         println!("{}", line);
     }
     Ok(())
+}
+
+fn cmd_export(bundle: &Path, format: &str, out: &Path) -> Result<()> {
+    if format != "agentos" {
+        return Err(Error::Other(format!(
+            "unsupported export format `{}` (only `agentos` is supported)",
+            format
+        )));
+    }
+    let agent_version = env!("CARGO_PKG_VERSION");
+    let v1 = agentos_bundle::build_agentos_bundle(bundle, agent_version)?;
+    let json = agentos_bundle::to_pretty_json(&v1)?;
+    if let Some(parent) = out.parent() {
+        if !parent.as_os_str().is_empty() {
+            fs::create_dir_all(parent).map_err(|e| Error::io(parent, e))?;
+        }
+    }
+    fs::write(out, json.as_bytes()).map_err(|e| Error::io(out, e))?;
+
+    println!("AgentOS-compatible bundle written: {}", out.display());
+    println!("schema_version:   {}", v1.schema_version);
+    println!(
+        "pack (derived):   ep-pv-{}",
+        &commitment_hex_prefix(&v1.hashes.commitment_hash)
+    );
+    println!("asset_ref:        {}", v1.plant.asset_ref);
+    println!("data_hash:        {}", v1.hashes.data_hash);
+    println!("commitment_hash:  {}", v1.hashes.commitment_hash);
+    println!("signature:        present (verified by AgentOS: no — present_not_verified)");
+    Ok(())
+}
+
+/// The bare-hex commitment prefix AgentOS uses to derive `pack_id`.
+fn commitment_hex_prefix(commitment_hash: &str) -> String {
+    let bare = commitment_hash
+        .strip_prefix("sha256:")
+        .unwrap_or(commitment_hash);
+    bare.chars().take(16).collect()
 }
 
 fn cmd_anchor_submit(

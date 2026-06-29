@@ -1,0 +1,45 @@
+{
+  "schema_version": "ippan.pv.evidence_bundle.v1",
+  "agent": {
+    "agent_id": "pv-agent-demo-0001",
+    "agent_version": "0.1.0",
+    "public_key": "ZGVtby1wdWJsaWMta2V5LW5vdC1yZWFsLWZpY3Rpb25hbA=="
+  },
+  "plant": {
+    "asset_ref": "earef:c5875ebfe5bab63eeb9e897b1a96cafc",
+    "technology": "solar_pv",
+    "location_ref": "Demo Region (fictional)"
+  },
+  "period": {
+    "start": "2026-05-20T12:15:00Z",
+    "end": "2026-05-20T12:30:00Z",
+    "interval_minutes": 15
+  },
+  "summary": {
+    "record_count": 1,
+    "total_energy_kwh": 463.1,
+    "anomalies_count": 1
+  },
+  "hashes": {
+    "data_hash": "sha256:f1f117601eabbe70653267f5fb3a2d018b1e2429010c677c2f89284acca735f1",
+    "commitment_hash": "sha256:f1f117601eabbe70653267f5fb3a2d018b1e2429010c677c2f89284acca735f1",
+    "canonicalization": "ippan.pv.canonical (sorted-keys, no-floats, utf-8)"
+  },
+  "signature": {
+    "algorithm": "ed25519",
+    "signer": "ZGVtby1wdWJsaWMta2V5LW5vdC1yZWFsLWZpY3Rpb25hbA==",
+    "signature": "ZGVtby1zaWduYXR1cmUtbm90LXJlYWwtZmljdGlvbmFsLXBsYWNlaG9sZGVy"
+  },
+  "anchor": {
+    "mode": "dry_run",
+    "anchor_hash": "sha256:f1f117601eabbe70653267f5fb3a2d018b1e2429010c677c2f89284acca735f1",
+    "submission_status": "dry_run_only",
+    "verification_status": "not_checked"
+  },
+  "files": {
+    "manifest": "manifest.json",
+    "data_summary": "source-metadata.json",
+    "validation_report": "verification-report.json",
+    "signed_payload": "canonical-record.json"
+  }
+}

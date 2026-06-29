@@ -286,6 +286,30 @@ It **does not** print:
 That makes `inspect` safe to paste into a ticket, share with an
 auditor, or include in a regulator report.
 
+## 10b. Exporting an AgentOS-compatible bundle
+
+`pv-agent export` produces a single `ippan.pv.evidence_bundle.v1` JSON
+file from a local evidence bundle. It is designed to be accepted by IPPAN
+AgentOS Energy's import validator (`POST /api/energy/import-pv-agent-bundle`,
+validate + preview).
+
+```bash
+pv-agent export --bundle <bundle-path> --format agentos --out ./agentos-bundle.json
+```
+
+It carries the pack hashes, a **pseudonymous** asset reference (the real
+plant id is never included), the period, an aggregate summary, and the
+existing Ed25519 signature over the canonical record bytes. It includes
+**no raw telemetry rows** and submits nothing to L1.
+
+AgentOS currently reports the signature as `present_not_verified` (it does
+not yet re-derive the canonical bytes to verify it). The
+`files.signed_payload` pointer names which file holds the signed bytes, for
+a future verification path. See
+[`docs/pv-agent/AGENTOS_EXPORT.md`](docs/pv-agent/AGENTOS_EXPORT.md) and the
+fictional example at
+[`examples/agentos/pv-agent-bundle.example.json`](examples/agentos/pv-agent-bundle.example.json).
+
 ## 11. Optional: submitting an anchor
 
 > **Anchoring is disabled by default.** You must enable it twice —

@@ -4,6 +4,7 @@
 //! Ed25519, stores complete evidence bundles locally, and anchors only the
 //! commitment hash to IPPAN / IPPANCENT L1.
 
+pub mod agentos_bundle;
 pub mod anchor;
 pub mod bundle;
 pub mod canonical;

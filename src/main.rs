@@ -88,7 +88,11 @@ enum Cmd {
         /// Path to an existing local evidence bundle directory.
         #[arg(long)]
         bundle: PathBuf,
-        /// Output format. Only `agentos` is supported.
+        /// Output format:
+        ///   `agentos`         — the bare `ippan.pv.evidence_bundle.v1` bundle.
+        ///   `agentos-import`  — the `{ bundle, signed_payload }` wrapper that
+        ///                       ships the exact signed canonical bytes so
+        ///                       AgentOS can verify the signature.
         #[arg(long, default_value = "agentos")]
         format: String,
         /// Output JSON file to write.
@@ -436,15 +440,24 @@ fn cmd_inspect(bundle: &Path) -> Result<()> {
 }
 
 fn cmd_export(bundle: &Path, format: &str, out: &Path) -> Result<()> {
-    if format != "agentos" {
-        return Err(Error::Other(format!(
-            "unsupported export format `{}` (only `agentos` is supported)",
-            format
-        )));
-    }
     let agent_version = env!("CARGO_PKG_VERSION");
+
+    // Build the bare bundle once; both formats share it.
     let v1 = agentos_bundle::build_agentos_bundle(bundle, agent_version)?;
-    let json = agentos_bundle::to_pretty_json(&v1)?;
+    let (json, with_signed_payload) = match format {
+        "agentos" => (agentos_bundle::to_pretty_json(&v1)?, false),
+        "agentos-import" => {
+            let wrapper = agentos_bundle::build_agentos_import_wrapper(bundle, agent_version)?;
+            (agentos_bundle::wrapper_to_pretty_json(&wrapper)?, true)
+        }
+        other => {
+            return Err(Error::Other(format!(
+                "unsupported export format `{}` (supported: `agentos`, `agentos-import`)",
+                other
+            )));
+        }
+    };
+
     if let Some(parent) = out.parent() {
         if !parent.as_os_str().is_empty() {
             fs::create_dir_all(parent).map_err(|e| Error::io(parent, e))?;
@@ -452,7 +465,12 @@ fn cmd_export(bundle: &Path, format: &str, out: &Path) -> Result<()> {
     }
     fs::write(out, json.as_bytes()).map_err(|e| Error::io(out, e))?;
 
-    println!("AgentOS-compatible bundle written: {}", out.display());
+    let kind = if with_signed_payload {
+        "AgentOS import wrapper (bundle + signed_payload)"
+    } else {
+        "AgentOS-compatible bundle"
+    };
+    println!("{} written: {}", kind, out.display());
     println!("schema_version:   {}", v1.schema_version);
     println!(
         "pack (derived):   ep-pv-{}",
@@ -461,7 +479,16 @@ fn cmd_export(bundle: &Path, format: &str, out: &Path) -> Result<()> {
     println!("asset_ref:        {}", v1.plant.asset_ref);
     println!("data_hash:        {}", v1.hashes.data_hash);
     println!("commitment_hash:  {}", v1.hashes.commitment_hash);
-    println!("signature:        present (verified by AgentOS: no — present_not_verified)");
+    if with_signed_payload {
+        println!(
+            "signed_payload:   included (exact signed canonical bytes — AgentOS can verify → verified)"
+        );
+    } else {
+        println!("signature:        present (AgentOS reports present_not_verified without signed_payload)");
+        println!(
+            "tip:              use `--format agentos-import` to ship the signed bytes for verification"
+        );
+    }
     Ok(())
 }
 

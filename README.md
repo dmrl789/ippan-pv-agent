@@ -299,16 +299,51 @@ pv-agent export --bundle <bundle-path> --format agentos --out ./agentos-bundle.j
 
 It carries the pack hashes, a **pseudonymous** asset reference (the real
 plant id is never included), the period, an aggregate summary, and the
-existing Ed25519 signature over the canonical record bytes. It includes
-**no raw telemetry rows** and submits nothing to L1.
+existing Ed25519 signature over the canonical record bytes. The bare bundle
+includes **no raw telemetry rows** and submits nothing to L1. Imported on its
+own, AgentOS reports the signature as `present_not_verified` — it has the
+signature metadata but not the bytes that were signed.
 
-AgentOS currently reports the signature as `present_not_verified` (it does
-not yet re-derive the canonical bytes to verify it). The
-`files.signed_payload` pointer names which file holds the signed bytes, for
-a future verification path. See
-[`docs/pv-agent/AGENTOS_EXPORT.md`](docs/pv-agent/AGENTOS_EXPORT.md) and the
-fictional example at
-[`examples/agentos/pv-agent-bundle.example.json`](examples/agentos/pv-agent-bundle.example.json).
+### Verifiable import (`--format agentos-import`)
+
+To let AgentOS reach `signature_status: verified`, export the **import
+wrapper**, which ships the exact signed canonical bytes alongside the bundle:
+
+```bash
+pv-agent export --bundle <bundle-path> --format agentos-import --out ./agentos-import.json
+```
+
+This emits the shape AgentOS's import route expects:
+
+```jsonc
+{
+  "bundle": { /* ippan.pv.evidence_bundle.v1 */ },
+  "signed_payload": {
+    "encoding": "utf8",
+    "canonical_bytes": "…",            // the EXACT bytes that were signed
+    "content_type": "application/json",
+    "description": "canonical-record.json"
+  }
+}
+```
+
+`signed_payload.canonical_bytes` is the verbatim content of the bundle's
+`canonical-record.json` — the exact bytes the agent signed. The agent does
+**not** reformat or regenerate them. AgentOS verifies the Ed25519 signature
+against those bytes and reports `verified` only on success (`failed` if they
+do not verify). Because the signed bytes are the full canonical record, this
+wrapper necessarily includes the canonical record contents (this is inherent
+to signature verification); use the bare `--format agentos` export when you
+only need the validate + preview path.
+
+The bare `agentos` format is unchanged, so existing consumers are unaffected.
+See [`docs/pv-agent/AGENTOS_EXPORT.md`](docs/pv-agent/AGENTOS_EXPORT.md), the
+fictional bare example at
+[`examples/agentos/pv-agent-bundle.example.json`](examples/agentos/pv-agent-bundle.example.json),
+and the verifiable wrapper example (real demo data) at
+[`examples/agentos/pv-agent-import.example.json`](examples/agentos/pv-agent-import.example.json).
+This milestone adds no persistence, anchoring, L1 contact, SCADA integration,
+or live submission.
 
 ## 11. Optional: submitting an anchor
 

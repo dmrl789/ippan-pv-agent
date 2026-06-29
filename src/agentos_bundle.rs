@@ -14,7 +14,9 @@
 //! pointer names which file holds them, for a future verification path. No raw
 //! high-frequency telemetry rows are included. Nothing is submitted to L1.
 
+use crate::bundle::read_canonical_bytes;
 use crate::{Error, Result};
+use base64::{engine::general_purpose::STANDARD as B64, Engine as _};
 use chrono::{DateTime, Duration, SecondsFormat, Utc};
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
@@ -24,6 +26,10 @@ use std::path::Path;
 
 pub const AGENTOS_BUNDLE_SCHEMA: &str = "ippan.pv.evidence_bundle.v1";
 const CANONICALIZATION: &str = "ippan.pv.canonical (sorted-keys, no-floats, utf-8)";
+
+/// The file inside the bundle directory whose raw bytes ARE the signed bytes.
+const SIGNED_PAYLOAD_DESCRIPTION: &str = "canonical-record.json";
+const SIGNED_PAYLOAD_CONTENT_TYPE: &str = "application/json";
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct EvidenceBundleV1 {
@@ -313,4 +319,76 @@ fn build_anchor_block(canonical_hash: &str, anchor_response: Option<&Value>) -> 
 /// Serialise the bundle as pretty JSON.
 pub fn to_pretty_json(bundle: &EvidenceBundleV1) -> Result<String> {
     Ok(serde_json::to_string_pretty(bundle)?)
+}
+
+// ---------------------------------------------------------------------------
+// AgentOS import wrapper ({ bundle, signed_payload }) — enables verification
+// ---------------------------------------------------------------------------
+
+/// The exact bytes the Ed25519 signature was computed over, carried alongside
+/// the bundle so AgentOS can perform real signature verification. AgentOS
+/// verifies these bytes *verbatim* (it does not re-canonicalize), so they must
+/// be the precise bytes that were signed.
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct SignedPayloadBlock {
+    /// How `canonical_bytes` is encoded: `utf8` (the canonical JSON text) or
+    /// `base64` (base64 of the raw signed bytes).
+    pub encoding: String,
+    pub canonical_bytes: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub content_type: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub description: Option<String>,
+}
+
+/// The AgentOS import request shape:
+///   `POST /api/energy/import-pv-agent-bundle` with `{ bundle, signed_payload }`.
+/// When AgentOS receives this, it verifies the bundle signature against the
+/// supplied bytes and can report `signature_status: verified`.
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct AgentOsImportWrapper {
+    pub bundle: EvidenceBundleV1,
+    pub signed_payload: SignedPayloadBlock,
+}
+
+/// Build the `signed_payload` block from the bundle's on-disk canonical record.
+///
+/// `canonical-record.json` is written as the *exact* canonical bytes that were
+/// signed (compact, sorted-keys, no-floats — see `bundle::build_bundle`), so we
+/// ship those bytes unchanged. They are valid UTF-8 by construction; we carry
+/// them as `utf8` text and only fall back to `base64` in the (unreachable)
+/// event that the bytes are not valid UTF-8 — never reformatting or
+/// regenerating them.
+pub fn build_signed_payload(bundle_dir: &Path) -> Result<SignedPayloadBlock> {
+    let signed_bytes = read_canonical_bytes(bundle_dir)?;
+    let (encoding, canonical_bytes) = match String::from_utf8(signed_bytes.clone()) {
+        Ok(text) => ("utf8".to_string(), text),
+        Err(_) => ("base64".to_string(), B64.encode(&signed_bytes)),
+    };
+    Ok(SignedPayloadBlock {
+        encoding,
+        canonical_bytes,
+        content_type: Some(SIGNED_PAYLOAD_CONTENT_TYPE.to_string()),
+        description: Some(SIGNED_PAYLOAD_DESCRIPTION.to_string()),
+    })
+}
+
+/// Build the full AgentOS import wrapper (`{ bundle, signed_payload }`) from a
+/// local evidence bundle directory. This is the shape AgentOS needs to reach
+/// `signature_status: verified`.
+pub fn build_agentos_import_wrapper(
+    bundle_dir: &Path,
+    agent_version: &str,
+) -> Result<AgentOsImportWrapper> {
+    let bundle = build_agentos_bundle(bundle_dir, agent_version)?;
+    let signed_payload = build_signed_payload(bundle_dir)?;
+    Ok(AgentOsImportWrapper {
+        bundle,
+        signed_payload,
+    })
+}
+
+/// Serialise the import wrapper as pretty JSON.
+pub fn wrapper_to_pretty_json(wrapper: &AgentOsImportWrapper) -> Result<String> {
+    Ok(serde_json::to_string_pretty(wrapper)?)
 }
